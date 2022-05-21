@@ -47,7 +47,7 @@
 
 - name: Copy gogs configuration
   ansible.builtin.template:
-    src: "{{ app_store }}/gogs/app.ini.j2"
+    src: "./gogs/app.ini.j2"
     dest: "{{ vol_dir }}/gogs/gogs/conf/app.ini"
     owner: root
     group: root
@@ -56,13 +56,22 @@
 
 - name: Check if gogs already configured
   stat:
-    path: "{{ vol_store }}/gogs/gogs/data/gogs.db"
+    path: "{{ vol_dir }}/gogs/gogs/data/gogs.db"
   register: gogs_db
   when: offline_mode
 
+- name: Copy app-jenkins compose file
+  ansible.builtin.template:
+    src: "./app-jenkins/docker-compose.yml.j2"
+    dest: "{{ app_dir }}/app-jenkins/docker-compose.yml"
+    owner: root
+    group: root
+    mode: '0775'
+  
+
 - name: Jenkins - Docker Compose
   community.docker.docker_compose:
-    project_src: "{{ app_store }}"
+    project_src: "{{ app_dir }}/app-jenkins"
     state: present
   become: true
 

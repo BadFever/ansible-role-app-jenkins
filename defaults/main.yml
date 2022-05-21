@@ -9,5 +9,6 @@ repositories:
     url: "https://github.com/BadFever/jenkins-task-play01.git"
 gogs_user: "ansible"
 gogs_password: "VMware1!"
+gogs_email: "anisble@localhost.com"
 
 
