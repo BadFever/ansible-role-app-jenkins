@@ -1,0 +1,42 @@
+---
+- name: Create application directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0775'
+  with_items:
+    - "{{ app_dir }}/app-jenkins"
+
+- name: Create Image directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0775'
+  with_items:
+    - "{{ app_dir }}/app-jenkins/images"
+    - "{{ app_dir }}/app-jenkins/images/jenkins"
+    - "{{ app_dir }}/app-jenkins/images/jenkins-worker"
+
+- name: Prepare jenkins image files
+  template:
+    src: "./jenkins/{{ item }}"
+    dest: "{{ app_dir }}/app-jenkins/image/jenkins"
+  with_items:
+    - casc.yml.j2
+    - Dockerfile.j2
+    - plugins.txt
+
+- name: Prepare jenkins worker image files
+  template:
+    src: "./jenkins-worker/{{ item }}"
+    dest: "{{ app_dir }}/app-jenkins/image/jenkins-worker"
+  with_items:
+    - Dockerfile.j2
+
+- name: Create Jenkins Docker image
+  community.docker.docker_image:
+    name: jenkins:v1.0
+    build:
+      path: "{{ app_dir }}/app-jenkins/image/jenkins"
+    source: build
+    state: present

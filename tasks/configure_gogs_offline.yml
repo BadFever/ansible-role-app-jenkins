@@ -1,0 +1,89 @@
+---
+- name: Get list of application tokens from gogs
+  uri:
+    url: "{{ gogs_host }}/users/{{ gogs_user }}/tokens"
+    method: GET
+    url_username: "{{ gogs_user }}"
+    url_password: "{{ gogs_password }}"
+    force_basic_auth: true
+  register: token_list
+
+- name: Filter API token
+  set_fact:
+    token_filtered: "{{ token_list.json | json_query(query_token) }}"
+  vars:
+    query_token: "[? name==`ansible_api_token`].{Token: sha1}"
+
+- name: Register API Token
+  set_fact:
+    token: "{{ token_filtered[0].Token }}"
+  when: token_filtered | length > 0
+
+- name: Create API Token
+  uri:
+    url: "{{ gogs_host }}/users/{{ gogs_user }}/tokens"
+    method: POST
+    url_username: "{{ gogs_user }}"
+    url_password: "{{ gogs_password }}"
+    force_basic_auth: true
+    status_code: 201
+    body_format: form-urlencoded
+    body:
+    - [ "name", "ansible_api_token"]
+  register: token_new
+  when: token is not defined
+
+- name: Register API token
+  set_fact:
+    token: "{{ token_new.json['sha1'] }}"
+  when: token is not defined
+
+- name: Get Repositories
+  uri:
+    url: "{{ gogs_host }}/user/repos"
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      Authorization: "token {{ token}}"
+  register: repos
+
+- name: Create Repositories
+  uri:
+    url: "{{ gogs_host }}/user/repos"
+    method: POST
+    status_code: 201
+    headers:
+      Content-Type: "application/x-www-form-urlencoded"
+      Authorization: "token {{ token }}"
+    body_format: form-urlencoded
+    body:
+     - [ "name", "{{ item.name }}" ]
+     - [ "auto_init", "true" ]
+     - [ "readme", "Default" ]
+  loop: "{{ repositories }}"
+  when: "repos.json | json_query(query) | length == 0"
+  vars:
+    query: "[?name=='{{ item.name }}'].name"
+
+- name: Clone required external repositories
+  git:
+    repo: "{{ item.url }}"
+    dest: "/store/iso/{{ item.name }}"
+  loop: "{{ repositories }}"
+
+- name: Change origin
+  community.general.git_config:
+    scope: local
+    repo: "/store/iso/{{ item.name }}"
+    name: remote.origin.url
+    value: "{{ gogs_host }}/{{ gogs_user }}/{{ item.name }}.git"
+  loop: "{{ repositories }}"
+
+- name: Push repositories into gogs
+  shell:
+    cmd: "git push -f -u http://{{ gogs_user }}:{{ gogs_password }}@{{ ansible_facts.default_ipv4.address }}:3000/{{ gogs_user }}/{{ item.name }}.git"
+    chdir: "/store/iso/{{ item.name }}"
+  loop: "{{ repositories }}"
+
+
+

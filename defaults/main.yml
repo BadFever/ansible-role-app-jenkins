@@ -1,0 +1,13 @@
+---
+vol_dir: "/store/volumes"
+app_dir: "/store/app"
+docker_network: "172.16.232.0/24"
+docker_network_gateway: "172.16.232.1"
+offline_mode: true
+repositories:
+  - name: "jenkins-task-play01"
+    url: "https://github.com/BadFever/jenkins-task-play01.git"
+gogs_user: "ansible"
+gogs_password: "VMware1!"
+
+

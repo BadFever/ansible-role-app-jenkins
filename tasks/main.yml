@@ -1,0 +1,7 @@
+---
+- include_tasks: install_docker.yml
+- include_tasks: docker_images.yml
+- include_tasks: app.yml
+
+- include_tasks: configure_gogs_offline
+  when: offline_mode

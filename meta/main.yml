@@ -1,0 +1,10 @@
+---
+dependencies: []
+
+galaxy_info:
+  author: badfever
+  description: "Install jenkins environment in docker"
+  license: "license (BSD, MIT)"
+  min_ansible_version: "1.8"
+  platforms:
+    - name: Ubuntu

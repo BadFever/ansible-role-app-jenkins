@@ -1,0 +1,76 @@
+---
+- name: Create directory structure
+  ansible.builtin.file:
+      path: "{{ item }}"
+      state: directory
+      owner: root
+      group: root
+      mode: '0775'
+  with_items:
+    - "{{ vol_dir }}/app-jenkins"
+    - "{{ vol_dir }}/app-jenkins/jenkins"
+    - "{{ vol_dir }}/app-jenkins/nginx"
+    - "{{ vol_dir }}/app-jenkins/nginx/conf.d"
+    - "{{ vol_dir }}/app-jenkins/log"
+    - "{{ vol_dir }}/app-jenkins/log/nginx"
+    - "{{ vol_dir }}/app-jenkins/log/nginx/jenkins"
+
+- name: Create jenkins_home
+  ansible.builtin.file:
+    path: "{{ vol_dir }}/app-jenkins/jenkins/jenkins_home"
+    owner: "1000"
+    group: "1000"
+    mode: 0777
+    recurse: true
+    state: directory
+
+- name: Create gogs directories
+  ansible.builtin.file:
+      path: "{{ item }}"
+      state: directory
+      owner: root
+      group: root
+      mode: '0775'
+  with_items:
+    - "{{ vol_dir }}/app-jenkins/gogs"
+    - "{{ vol_dir }}/app-jenkins/gogs/gogs"
+    - "{{ vol_dir }}/app-jenkins/gogs/gogs/conf"
+  when: offline_mode
+
+- name: Copy nginx configuration
+  ansible.builtin.template:
+    src: "./nginx/jenkins.conf"
+    dest: "{{ vol-dir }}/app-jenkins/nginx/conf.d/jenkins.conf"
+    owner: root
+    group: root
+    mode: '0775'
+
+- name: Copy gogs configuration
+  ansible.builtin.template:
+    src: "{{ app_store }}/gogs/app.ini.j2"
+    dest: "{{ vol_dir }}/gogs/gogs/conf/app.ini"
+    owner: root
+    group: root
+    mode: '0775'
+  when: offline_mode
+
+- name: Check if gogs already configured
+  stat:
+    path: "{{ vol_store }}/gogs/gogs/data/gogs.db"
+  register: gogs_db
+  when: offline_mode
+
+- name: Jenkins - Docker Compose
+  community.docker.docker_compose:
+    project_src: "{{ app_store }}"
+    state: present
+  become: true
+
+- name: Create initial gogs user
+  community.docker.docker_container_exec:
+    container: gogs
+    command: /bin/bash -c "./gogs admin create-user --name '{{ gogs_user }}' --password '{{ gogs_password }}' --email '{{ gogs_email }}' --admin"
+    user: git
+    chdir: /app/gogs
+  register: result
+  when: not gogs_db.stat.exists && offline_mode
