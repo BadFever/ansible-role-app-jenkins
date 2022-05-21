@@ -1,4 +1,3 @@
----
 - name: Create application directory
   file:
     path: "{{ item }}"

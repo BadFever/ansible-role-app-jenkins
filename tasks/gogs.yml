@@ -1,4 +1,3 @@
----
 - name: Get list of application tokens from gogs
   uri:
     url: "{{ gogs_host }}/users/{{ gogs_user }}/tokens"
