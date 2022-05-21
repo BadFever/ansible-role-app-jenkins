@@ -19,7 +19,7 @@
 - name: Prepare jenkins image files
   template:
     src: "./jenkins/{{ item }}"
-    dest: "{{ app_dir }}/app-jenkins/image/jenkins"
+    dest: "{{ app_dir }}/app-jenkins/images/jenkins"
   with_items:
     - casc.yml.j2
     - Dockerfile.j2
@@ -28,7 +28,7 @@
 - name: Prepare jenkins worker image files
   template:
     src: "./jenkins-worker/{{ item }}"
-    dest: "{{ app_dir }}/app-jenkins/image/jenkins-worker"
+    dest: "{{ app_dir }}/app-jenkins/images/jenkins-worker"
   with_items:
     - Dockerfile.j2
 
@@ -36,6 +36,6 @@
   community.docker.docker_image:
     name: jenkins:v1.0
     build:
-      path: "{{ app_dir }}/app-jenkins/image/jenkins"
+      path: "{{ app_dir }}/app-jenkins/images/jenkins"
     source: build
     state: present
