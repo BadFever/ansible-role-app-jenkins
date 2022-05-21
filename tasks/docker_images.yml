@@ -23,7 +23,7 @@
   with_items:
     - casc.yml.j2
     - Dockerfile.j2
-    - plugins.txt
+    - plugins.txt.j2
 
 - name: Prepare jenkins worker image files
   template:
