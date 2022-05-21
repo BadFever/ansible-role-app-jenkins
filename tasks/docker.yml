@@ -44,3 +44,6 @@
     regexp: '^ExecStart='
     line: ExecStart=/usr/bin/dockerd -H fd:// -H=tcp://0.0.0.0:2375 --tls=false --containerd=/run/containerd/containerd.sock
   notify: Restart docker daemon
+
+- name: Flush handlers
+  meta: flush_handlers
