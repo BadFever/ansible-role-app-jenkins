@@ -28,7 +28,7 @@
 - name: Prepare jenkins worker image files
   template:
     src: "./jenkins-worker/{{ item }}"
-    dest: "{{ app_dir }}/app-jenkins/images/jenkins-worker/{{ image | regex_replace('.j2','') }}"
+    dest: "{{ app_dir }}/app-jenkins/images/jenkins-worker/{{ item | regex_replace('.j2','') }}"
   with_items:
     - Dockerfile.j2
 
