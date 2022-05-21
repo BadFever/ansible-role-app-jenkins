@@ -82,4 +82,4 @@
     user: git
     chdir: /app/gogs
   register: result
-  when: not gogs_db.stat.exists && offline_mode
+  when: not gogs_db.stat.exists and offline_mode
