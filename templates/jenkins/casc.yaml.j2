@@ -4,14 +4,14 @@ credentials:
     - credentials:
       - usernamePassword:
           id: "jenkins-agent"
-          password: "VMware1!"
+          password: "{{ jenkins_worker_user }}"
           scope: GLOBAL
-          username: "jenkins"
+          username: "{{ jenkins_worker_password}}"
       - usernamePassword:
           id: "gogs-ansible"
-          password: "VMware1!"
+          password: "{{ gogs_password }}"
           scope: GLOBAL
-          username: "ansible"
+          username: "{{ gogs_user }}"
 jenkins:
   numExecutors: 0
   securityRealm:
@@ -31,7 +31,7 @@ jenkins:
         dockerApi:
           connectTimeout: 60
           dockerHost:
-            uri: "tcp://172.16.232.1:2375"
+            uri: "tcp:/{{ docker_app_jenkins_network_gateway}}:2375"
           readTimeout: 60
         templates:
           - connector:

@@ -5,9 +5,9 @@ services:
     container_name: nginx-jenkins
     image: "nginx:1.20-alpine"
     volumes:
-      - {{ vol_dir }}/app-jenkins/nginx/conf.d:/etc/nginx/conf.d:ro
-      - {{ vol_dir }}/app-jenkins/jenkins/log/nginx:/var/log/nginx
-      - {{ vol_dir }}/jenkins/log/nginx/jenkins:/var/log/nginx/jenkins
+      - {{ docker_vol_dir }}/app-jenkins/nginx/conf.d:/etc/nginx/conf.d:ro
+      - {{ docker_vol_dir }}/app-jenkins/jenkins/log/nginx:/var/log/nginx
+      - {{ docker_vol_dir }}/jenkins/log/nginx/jenkins:/var/log/nginx/jenkins
     restart: always
     ports:
       - "80:80"
@@ -27,7 +27,7 @@ services:
     container_name: gogs
     image: "gogs/gogs:latest"
     volumes:
-      - {{ vol_dir }}/app-jenkins/gogs:/data
+      - {{ docker_vol_dir }}/app-jenkins/gogs:/data
     ports:
       - "3000:3000"
     restart: always
@@ -39,5 +39,5 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: {{ docker_network }}
-          gateway: {{ docker_network_gateway }}
+        - subnet: {{ docker_app_jenkins_network }}
+          gateway: {{ docker_app_jenkins_network_gateway }}

@@ -1,8 +1,8 @@
 ---
-vol_dir: "/store/volumes"
-app_dir: "/store/app"
-docker_network: "172.16.232.0/24"
-docker_network_gateway: "172.16.232.1"
+docker_vol_dir: "/store/volumes"
+docker_app_dir: "/store/app"
+docker_app_jenkins_network: "172.16.232.0/24"
+docker_app_jenkins_network_gateway: "172.16.232.1"
 offline_mode: true
 repositories:
   - name: "jenkins-task-play01"
@@ -10,5 +10,7 @@ repositories:
 gogs_user: "ansible"
 gogs_password: "VMware1!"
 gogs_email: "anisble@localhost.com"
+jenkins_worker_user: "jenkins"
+jenkins_worker_password: "VMware1!"
 
 
