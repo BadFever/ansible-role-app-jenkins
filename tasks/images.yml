@@ -4,7 +4,7 @@
     state: directory
     mode: '0775'
   with_items:
-    - "{{ app_dir }}/app-jenkins"
+    - "{{ docker_app_dir }}/app-jenkins"
 
 - name: Create Image directories
   file:
@@ -12,14 +12,15 @@
     state: directory
     mode: '0775'
   with_items:
-    - "{{ app_dir }}/app-jenkins/images"
-    - "{{ app_dir }}/app-jenkins/images/jenkins"
-    - "{{ app_dir }}/app-jenkins/images/jenkins-worker"
+    - "{{ docker_app_dir }}/app-jenkins/images"
+    - "{{ docker_app_dir }}/app-jenkins/images/jenkins"
+    - "{{ docker_app_dir }}/app-jenkins/images/jenkins-worker"
+    - "{{ docker_app_dir }}/app-jenkins/images/jenkins-worker/.ssh"
 
 - name: Prepare jenkins image files
   template:
     src: "./jenkins/{{ item }}"
-    dest: "{{ app_dir }}/app-jenkins/images/jenkins/{{ item | regex_replace('.j2','') }}"
+    dest: "{{ docker_app_dir }}/app-jenkins/images/jenkins/{{ item | regex_replace('.j2','') }}"
   with_items:
     - casc.yaml.j2
     - Dockerfile.j2
@@ -28,14 +29,21 @@
 - name: Prepare jenkins worker image files
   template:
     src: "./jenkins-worker/{{ item }}"
-    dest: "{{ app_dir }}/app-jenkins/images/jenkins-worker/{{ item | regex_replace('.j2','') }}"
+    dest: "{{ docker_app_dir }}/app-jenkins/images/jenkins-worker/{{ item | regex_replace('.j2','') }}"
   with_items:
     - Dockerfile.j2
+
+- name: Prepare jenkins worker image files
+  template:
+    src: "./jenkins-worker/{{ item }}"
+    dest: "{{ docker_app_dir }}/app-jenkins/images/jenkins-worker/.ssh/{{ item | regex_replace('.j2','') }}"
+  with_items:
+    - authorized_keys.j2
 
 - name: Create Jenkins Docker image
   community.docker.docker_image:
     name: jenkins:v1.0
     build:
-      path: "{{ app_dir }}/app-jenkins/images/jenkins"
+      path: "{{ docker_app_dir }}/app-jenkins/images/jenkins"
     source: build
     state: present
