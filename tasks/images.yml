@@ -21,7 +21,7 @@
     src: "./jenkins/{{ item }}"
     dest: "{{ app_dir }}/app-jenkins/images/jenkins"
   with_items:
-    - casc.yml.j2
+    - casc.yaml.j2
     - Dockerfile.j2
     - plugins.txt.j2
 
