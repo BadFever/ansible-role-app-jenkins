@@ -18,7 +18,7 @@
 
 - name: Prepare jenkins image files
   template:
-    src: "./jenkins/{{ item }}"
+    src: "./jenkins/{{ item | regex_replace('.j2','')}}"
     dest: "{{ app_dir }}/app-jenkins/images/jenkins"
   with_items:
     - casc.yaml.j2
@@ -27,7 +27,7 @@
 
 - name: Prepare jenkins worker image files
   template:
-    src: "./jenkins-worker/{{ item }}"
+    src: "./jenkins-worker/{{ item | regex_replace('.j2','') }}"
     dest: "{{ app_dir }}/app-jenkins/images/jenkins-worker"
   with_items:
     - Dockerfile.j2
