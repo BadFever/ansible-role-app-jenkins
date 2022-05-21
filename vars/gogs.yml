@@ -1,0 +1,2 @@
+---
+gogs_host: "http://{{ ansible_facts.default_ipv4.address }}:3000/api/v1"
