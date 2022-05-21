@@ -39,7 +39,7 @@
 
 - name: Copy nginx configuration
   ansible.builtin.template:
-    src: "./nginx/jenkins.conf"
+    src: "./nginx/jenkins.conf.j2"
     dest: "{{ vol-dir }}/app-jenkins/nginx/conf.d/jenkins.conf"
     owner: root
     group: root
