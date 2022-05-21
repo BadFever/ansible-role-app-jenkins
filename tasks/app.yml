@@ -7,17 +7,17 @@
       group: root
       mode: '0775'
   with_items:
-    - "{{ vol_dir }}/app-jenkins"
-    - "{{ vol_dir }}/app-jenkins/jenkins"
-    - "{{ vol_dir }}/app-jenkins/nginx"
-    - "{{ vol_dir }}/app-jenkins/nginx/conf.d"
-    - "{{ vol_dir }}/app-jenkins/log"
-    - "{{ vol_dir }}/app-jenkins/log/nginx"
-    - "{{ vol_dir }}/app-jenkins/log/nginx/jenkins"
+    - "{{ docker_vol_dir }}/app-jenkins"
+    - "{{ docker_vol_dir }}/app-jenkins/jenkins"
+    - "{{ docker_vol_dir }}/app-jenkins/nginx"
+    - "{{ docker_vol_dir }}/app-jenkins/nginx/conf.d"
+    - "{{ docker_vol_dir }}/app-jenkins/log"
+    - "{{ docker_vol_dir }}/app-jenkins/log/nginx"
+    - "{{ docker_vol_dir }}/app-jenkins/log/nginx/jenkins"
 
 - name: Create jenkins_home
   ansible.builtin.file:
-    path: "{{ vol_dir }}/app-jenkins/jenkins/jenkins_home"
+    path: "{{ docker_vol_dir }}/app-jenkins/jenkins/jenkins_home"
     owner: "1000"
     group: "1000"
     mode: 0777
@@ -32,15 +32,15 @@
       group: root
       mode: '0775'
   with_items:
-    - "{{ vol_dir }}/app-jenkins/gogs"
-    - "{{ vol_dir }}/app-jenkins/gogs/gogs"
-    - "{{ vol_dir }}/app-jenkins/gogs/gogs/conf"
+    - "{{ docker_vol_dir }}/app-jenkins/gogs"
+    - "{{ docker_vol_dir }}/app-jenkins/gogs/gogs"
+    - "{{ docker_vol_dir }}/app-jenkins/gogs/gogs/conf"
   when: offline_mode
 
 - name: Copy nginx configuration
   ansible.builtin.template:
     src: "./nginx/jenkins.conf.j2"
-    dest: "{{ vol_dir }}/app-jenkins/nginx/conf.d/jenkins.conf"
+    dest: "{{ docker_vol_dir }}/app-jenkins/nginx/conf.d/jenkins.conf"
     owner: root
     group: root
     mode: '0775'
@@ -48,7 +48,7 @@
 - name: Copy gogs configuration
   ansible.builtin.template:
     src: "./gogs/app.ini.j2"
-    dest: "{{ vol_dir }}/app-jenkins/gogs/gogs/conf/app.ini"
+    dest: "{{ docker_vol_dir }}/app-jenkins/gogs/gogs/conf/app.ini"
     owner: root
     group: root
     mode: '0775'
@@ -56,14 +56,14 @@
 
 - name: Check if gogs already configured
   stat:
-    path: "{{ vol_dir }}/app-jenkins/gogs/gogs/data/gogs.db"
+    path: "{{ docker_vol_dir }}/app-jenkins/gogs/gogs/data/gogs.db"
   register: gogs_db
   when: offline_mode
 
 - name: Copy app-jenkins compose file
   ansible.builtin.template:
     src: "./app-jenkins/docker-compose.yml.j2"
-    dest: "{{ app_dir }}/app-jenkins/docker-compose.yml"
+    dest: "{{ docker_app_dir }}/app-jenkins/docker-compose.yml"
     owner: root
     group: root
     mode: '0775'
@@ -71,7 +71,7 @@
 
 - name: Jenkins - Docker Compose
   community.docker.docker_compose:
-    project_src: "{{ app_dir }}/app-jenkins"
+    project_src: "{{ docker_app_dir }}/app-jenkins"
     state: present
   become: true
 
