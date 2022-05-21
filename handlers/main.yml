@@ -1,4 +1,3 @@
----
 - name: Restart docker daemon
   systemd:
     name: docker.service
